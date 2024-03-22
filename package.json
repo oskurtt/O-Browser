@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "fingerprint-generator": "^2.1.49",
+    "fingerprint-injector": "^2.1.49",
+    "puppeteer": "^22.6.0",
+    "puppeteer-core": "^22.6.0",
+    "puppeteer-with-fingerprints": "^1.4.7"
+  }
+}
