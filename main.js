@@ -1,26 +1,12 @@
 const { plugin } = require('puppeteer-with-fingerprints');
 const { readFile, writeFile, mkdir } = require('fs/promises');
-const { FingerprintGenerator } = require('fingerprint-generator');
+const path = require('path');
+const { start } = require('repl');
 
 async function fetchFingerprint() {
     const fingerprint = await plugin.fetch('', {
         tags: ['Microsoft Windows', 'Chrome'],
     });
-    // const fingerprintGenerator = new FingerprintGenerator({
-    //     // Example configuration, adjust as needed
-    //     browsers: ['chrome', 'firefox', 'safari'],
-    //     //operatingSystems: ['windows', 'macos', 'linux'],
-    //     operatingSystems: ['windows'],
-    //     devices: ['desktop'],
-    //     screen: {
-    //         // Define minimum and maximum width
-    //         width: { min: 1000, max: 1500 },
-    //         // Similarly, you can define height if needed
-    //         height: { min: 500, max: 700 },
-    //       },
-    // });
-
-    // const fingerprint = fingerprintGenerator.getFingerprint();
     return fingerprint;
 }
 
@@ -50,23 +36,43 @@ async function loadFingerprint(profilePath) {
     }
 }
 
-// Main function:
-async function main() {
+async function startInstance(profileName) {
     try{
-        let profilePath = './profiles/pink-flamingo';
+        let profilePath = `./profiles/${profileName}`;
         let fingerprint = await loadFingerprint(profilePath);
-        plugin.useFingerprint(fingerprint);
 
-        const browser = await plugin.launch({headless: false});
+        plugin.useFingerprint(fingerprint);
+        const browser = await plugin.launch(
+            {
+              userDataDir: profilePath,
+              // Browser arguments can be used as well:
+              args: [`--user-data-dir=${path.resolve(profilePath)}`],
+              headless: false
+            }
+          );
+
         const page = await browser.newPage();
-        await page.goto('https://amiunique.org/fingerprint');
+        //await page.goto('https://amiunique.org/fingerprint');
+        await page.evaluate((profileName) => {
+            document.title = profileName;
+        }, profileName);
 
         browser.on('disconnected', async () => {
             await saveFingerprint(fingerprint, profilePath);
             console.log(`Fingerprint saved to ${profilePath} after browser closed.`);
         });
 
-        console.log('Close the browser to save the fingerprint.');
+        console.log(`${profileName} - Close the browser to save the fingerprint.`);
+    }
+    catch (error) {
+        console.log('Err at startInstance:', error);
+    }
+}
+// Main function:
+async function main() {
+    try{
+        await startInstance('oli');
+        await startInstance('akang');
     }
     catch (error) {
         console.log('Err at main:', error);

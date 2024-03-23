@@ -7,9 +7,9 @@ const path = require('path');
   
   const browser = await plugin.launch(
     {
-      userDataDir: './test-profile/oli',
+      userDataDir: './test-profile/akang',
       // Browser arguments can be used as well:
-      args: [`--user-data-dir=${path.resolve('./test-profile/oli')}`],
+      args: [`--user-data-dir=${path.resolve('./test-profile/akang')}`],
       headless: false
     }
   );
