@@ -5,5 +5,18 @@
     "puppeteer": "^22.6.0",
     "puppeteer-core": "^22.6.0",
     "puppeteer-with-fingerprints": "^1.4.7"
-  }
+  },
+  "name": "o-browser",
+  "version": "1.0.0",
+  "main": "main.js",
+  "devDependencies": {
+    "electron": "^29.1.5"
+  },
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
