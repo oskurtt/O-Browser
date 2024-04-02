@@ -1,5 +1,6 @@
-const { app, BrowserWindow } = require('electron/main')
-const path = require('node:path')
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const fs = require('fs');
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -7,13 +8,25 @@ function createWindow () {
     height: 800,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true
+      contextIsolation: true,
+      nodeIntegration: false
     }
   });
 
   win.loadFile('index.html');
-  win.webContents.openDevTools();
+  //win.webContents.openDevTools();
 
+  win.webContents.on('did-finish-load', () => {
+    const profilesPath = path.join(__dirname, 'profiles');
+    fs.readdir(profilesPath, { withFileTypes: true }, (err, entries) => {
+        if (err) {
+            console.error('Failed to read profiles directory:', err);
+            return;
+        }
+        const folders = entries.filter(entry => entry.isDirectory()).map(dir => dir.name);
+        win.webContents.send('profiles-loaded', folders);
+    });
+  });
 }
 
 app.whenReady().then(() => {
