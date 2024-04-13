@@ -1,28 +1,31 @@
 document.getElementById('addProfile').addEventListener('click', () => {
     const profileName = document.getElementById('profileName').value;
     if (profileName) {
-        const profileList = document.getElementById('profileList');
-        const li = document.createElement('li');
-        li.textContent = profileName;
+        window.electronAPI.createProfileDirectory(profileName, (exists) => {
+            if (exists) {
+                alert(`${profileName} already exists!`);
+            } else {
+                const profileList = document.getElementById('profileList');
+                const li = document.createElement('li');
+                li.textContent = profileName;
 
-        // Create a button to start the profile
-        const startBtn = document.createElement('button');
-        startBtn.textContent = 'Start';
-        
-        // Attach the click event listener to this button
-        startBtn.addEventListener('click', () => {
-            const message = document.createElement('p');
-            message.textContent = `Profile '${profileName}' started!`;
-            document.body.appendChild(message); // Append the message to the body
+                const startBtn = document.createElement('button');
+                startBtn.textContent = 'Start';
+                startBtn.addEventListener('click', () => {
+                    const message = document.createElement('p');
+                    message.textContent = `Profile '${profileName}' started!`;
+                    document.body.appendChild(message);
+                });
+
+                li.appendChild(startBtn);
+                profileList.appendChild(li);
+
+                document.getElementById('profileName').value = ''; // Clear the input
+            }
         });
-
-        li.appendChild(startBtn);
-        profileList.appendChild(li);
-
-        // Clear the input after adding the profile
-        document.getElementById('profileName').value = '';
     }
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
     window.electronAPI.onProfilesLoaded((event, profiles) => {
@@ -34,6 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Create a "Start" button for each profile loaded
             const startBtn = document.createElement('button');
             startBtn.textContent = 'Start';
+
+            // Create a "Delete" button for each profile loaded
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+
+
             // Attach the click event listener to this button
             startBtn.addEventListener('click', () => {
                 const message = document.createElement('p');
@@ -41,7 +50,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.appendChild(message); // Append the message to the body
             });
 
+            // Attach the click event listener to the "Delete" button
+            deleteBtn.addEventListener('click', () => {
+                const message = document.createElement('p');
+                message.textContent = `Profile '${profile}' deleted!`;
+                document.body.appendChild(message); // Append the message to the body
+                li.remove(); // Remove the list item from the DOM
+                window.electronAPI.deleteProfile(profile); // Request the main process to delete the folder
+            });
+
             li.appendChild(startBtn); // Append the "Start" button to the list item
+            li.appendChild(deleteBtn);
             profileList.appendChild(li); // Append the list item to the profile list
         });
     });

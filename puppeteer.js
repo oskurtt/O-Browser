@@ -72,7 +72,7 @@ async function startInstance(profileName) {
 async function main() {
     try{
         await startInstance('oli');
-        await startInstance('akang');
+        await startInstance('test');
     }
     catch (error) {
         console.log('Err at main:', error);

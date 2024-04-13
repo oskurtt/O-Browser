@@ -27,6 +27,27 @@ function createWindow () {
         win.webContents.send('profiles-loaded', folders);
     });
   });
+
+  ipcMain.handle('create-profile-directory', async (event, profileName) => {
+    const profilePath = path.join(__dirname, 'profiles', profileName);
+    try {
+        await fs.promises.access(profilePath, fs.constants.F_OK);
+        return true; // Folder exists
+    } catch {
+        // Folder does not exist, create it
+        await fs.promises.mkdir(profilePath);
+        return false; // Folder was created
+    }
+  });
+
+  ipcMain.on('delete-profile', (event, profileName) => {
+    const profilePath = path.join(__dirname, 'profiles', profileName);
+    fs.rmdir(profilePath, { recursive: true }, (err) => {
+        if (err) {
+            console.error(`Failed to delete profile directory ${profilePath}:`, err);
+        }
+    });
+  });
 }
 
 app.whenReady().then(() => {
