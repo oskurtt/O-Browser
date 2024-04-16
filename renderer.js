@@ -1,7 +1,11 @@
 function addProfileToList(profileName) {
     const profileList = document.getElementById('profileList');
     const li = document.createElement('li');
+    const profileText = document.createElement('span'); 
+    profileText.textContent = profileName;
     li.textContent = profileName;
+
+    const buttonContainer = document.createElement('div'); 
 
     const startBtn = document.createElement('button');
     startBtn.textContent = 'Start';
@@ -17,18 +21,19 @@ function addProfileToList(profileName) {
         const message = document.createElement('p');
         message.textContent = `Profile '${profileName}' deleted!`;
         document.body.appendChild(message);
-        li.remove(); // Remove the list item from the DOM
-        window.electronAPI.deleteProfile(profileName); // Request the main process to delete the folder
+        li.remove(); 
+        window.electronAPI.deleteProfile(profileName); 
     });
 
-    li.appendChild(startBtn); // Append the "Start" button to the list item
-    li.appendChild(deleteBtn); // Append the "Delete" button to the list item
-    profileList.appendChild(li); // Append the list item to the profile list
+    buttonContainer .appendChild(startBtn); 
+    buttonContainer .appendChild(deleteBtn); 
+    li.appendChild(buttonContainer); 
+    profileList.appendChild(li); 
 }
 
 document.getElementById('addProfile').addEventListener('click', () => {
     const profileNameInput = document.getElementById('profileName');
-    const profileName = profileNameInput.value.trim(); // Use trim to ensure no leading/trailing whitespace
+    const profileName = profileNameInput.value.trim(); 
 
     if (profileName) {
         window.electronAPI.createProfileDirectory(profileName, (exists) => {
@@ -36,16 +41,16 @@ document.getElementById('addProfile').addEventListener('click', () => {
                 const message = document.createElement('p');
                 message.textContent = `Profile '${profileName}' already exists!`;
                 document.body.appendChild(message);
-                profileNameInput.focus(); // Refocus on the input field
+                profileNameInput.focus();
             } else {
-                addProfileToList(profileName); // Use the reusable function
-                profileNameInput.value = ''; // Clear the input
-                profileNameInput.focus(); // Immediately refocus on the input field
+                addProfileToList(profileName);
+                profileNameInput.value = '';
+                profileNameInput.focus(); 
             }
         });
     } else {
         alert("Please enter a profile name.");
-        profileNameInput.focus(); // Refocus on the input field if no name was entered
+        profileNameInput.focus(); 
     }
 });
 
@@ -53,7 +58,7 @@ document.getElementById('addProfile').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
     window.electronAPI.onProfilesLoaded((event, profiles) => {
         profiles.forEach(profile => {
-            addProfileToList(profile); // Use the reusable function for each loaded profile
+            addProfileToList(profile); 
         });
     });
 });
