@@ -13,6 +13,8 @@ function addProfileToList(profileName) {
         const message = document.createElement('p');
         message.textContent = `Profile '${profileName}' started!`;
         document.body.appendChild(message);
+        window.electronAPI.startPuppeteer(profileName);
+
     });
 
     const deleteBtn = document.createElement('button');
@@ -25,8 +27,8 @@ function addProfileToList(profileName) {
         window.electronAPI.deleteProfile(profileName); 
     });
 
-    buttonContainer .appendChild(startBtn); 
-    buttonContainer .appendChild(deleteBtn); 
+    buttonContainer.appendChild(startBtn); 
+    buttonContainer.appendChild(deleteBtn); 
     li.appendChild(buttonContainer); 
     profileList.appendChild(li); 
 }

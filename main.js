@@ -48,6 +48,12 @@ function createWindow () {
         }
     });
   });
+  ipcMain.on('start-puppeteer', (event, profileName) => {
+    console.log(`Starting Puppeteer for profile: ${profileName}`);
+    puppeteerScript.startInstance(profileName); // Call the function from puppeteer.js
+});
+
+  
 }
 
 app.whenReady().then(() => {
