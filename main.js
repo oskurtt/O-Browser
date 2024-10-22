@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const puppeteerScript = require('./puppeteer.js');
 
 function createWindow () {
   const win = new BrowserWindow({
@@ -32,11 +33,10 @@ function createWindow () {
     const profilePath = path.join(__dirname, 'profiles', profileName);
     try {
         await fs.promises.access(profilePath, fs.constants.F_OK);
-        return true; // Folder exists
+        return true;
     } catch {
-        // Folder does not exist, create it
         await fs.promises.mkdir(profilePath);
-        return false; // Folder was created
+        return false; 
     }
   });
 
@@ -50,7 +50,7 @@ function createWindow () {
   });
   ipcMain.on('start-puppeteer', (event, profileName) => {
     console.log(`Starting Puppeteer for profile: ${profileName}`);
-    puppeteerScript.startInstance(profileName); // Call the function from puppeteer.js
+    puppeteerScript.startInstance(profileName);
 });
 
   

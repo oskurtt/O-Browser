@@ -10,9 +10,6 @@ function addProfileToList(profileName) {
     const startBtn = document.createElement('button');
     startBtn.textContent = 'Start';
     startBtn.addEventListener('click', () => {
-        const message = document.createElement('p');
-        message.textContent = `Profile '${profileName}' started!`;
-        document.body.appendChild(message);
         window.electronAPI.startPuppeteer(profileName);
 
     });
@@ -20,9 +17,6 @@ function addProfileToList(profileName) {
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
     deleteBtn.addEventListener('click', () => {
-        const message = document.createElement('p');
-        message.textContent = `Profile '${profileName}' deleted!`;
-        document.body.appendChild(message);
         li.remove(); 
         window.electronAPI.deleteProfile(profileName); 
     });
@@ -35,26 +29,37 @@ function addProfileToList(profileName) {
 
 document.getElementById('addProfile').addEventListener('click', () => {
     const profileNameInput = document.getElementById('profileName');
-    const profileName = profileNameInput.value.trim(); 
+    const profileName = profileNameInput.value.trim();
 
     if (profileName) {
         window.electronAPI.createProfileDirectory(profileName, (exists) => {
             if (exists) {
-                const message = document.createElement('p');
-                message.textContent = `Profile '${profileName}' already exists!`;
-                document.body.appendChild(message);
+                showNotification(`Profile '${profileName}' already exists!`, 'error');
                 profileNameInput.focus();
             } else {
                 addProfileToList(profileName);
                 profileNameInput.value = '';
-                profileNameInput.focus(); 
+                profileNameInput.focus();
+                showNotification(`Profile '${profileName}' has been created!`, 'success');
             }
         });
     } else {
-        alert("Please enter a profile name.");
-        profileNameInput.focus(); 
+        showNotification('Please enter a profile name.', 'error');
+        profileNameInput.focus();
     }
 });
+
+function showNotification(message, type) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = type; 
+    notification.classList.remove('hidden');
+
+    setTimeout(() => {
+        notification.classList.add('hidden');
+    }, 2000);
+}
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
