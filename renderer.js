@@ -3,7 +3,7 @@ function addProfileToList(profileName) {
     const li = document.createElement('li');
     const profileText = document.createElement('span'); 
     profileText.textContent = profileName;
-    li.textContent = profileName;
+    li.appendChild(profileText);
 
     const buttonContainer = document.createElement('div'); 
 
@@ -11,7 +11,6 @@ function addProfileToList(profileName) {
     startBtn.textContent = 'Start';
     startBtn.addEventListener('click', () => {
         window.electronAPI.startPuppeteer(profileName);
-
     });
 
     const deleteBtn = document.createElement('button');
@@ -21,11 +20,29 @@ function addProfileToList(profileName) {
         window.electronAPI.deleteProfile(profileName); 
     });
 
+    const renameBtn = document.createElement('button');
+    renameBtn.textContent = 'Rename';
+    renameBtn.addEventListener('click', async () => {
+        const newName = prompt(`Enter new name for profile '${profileName}':`, profileName);
+        if (newName && newName.trim() !== profileName) {
+            const result = await window.electronAPI.renameProfile(profileName, newName.trim());
+            if (result.success) {
+                profileText.textContent = newName;
+                profileName = newName;
+                showNotification(`Profile renamed to '${newName}'!`, 'success');
+            } else {
+                showNotification(`Failed to rename profile: ${result.error}`, 'error');
+            }
+        }
+    });
+
     buttonContainer.appendChild(startBtn); 
     buttonContainer.appendChild(deleteBtn); 
+    buttonContainer.appendChild(renameBtn); 
     li.appendChild(buttonContainer); 
     profileList.appendChild(li); 
 }
+
 
 document.getElementById('addProfile').addEventListener('click', () => {
     const profileNameInput = document.getElementById('profileName');
