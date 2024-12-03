@@ -48,6 +48,21 @@ function createWindow () {
         }
     });
   });
+
+  ipcMain.handle('rename-profile', async (event, oldName, newName) => {
+    const profilesPath = path.join(__dirname, 'profiles');
+    const oldPath = path.join(profilesPath, oldName);
+    const newPath = path.join(profilesPath, newName);
+
+    try {
+        await fs.promises.rename(oldPath, newPath);
+        return { success: true };
+    } catch (err) {
+        console.error(`Failed to rename profile from '${oldName}' to '${newName}':`, err);
+        return { success: false, error: err.message };
+    }
+  });
+
   ipcMain.on('start-puppeteer', (event, profileName) => {
     console.log(`Starting Puppeteer for profile: ${profileName}`);
     puppeteerScript.startInstance(profileName);
